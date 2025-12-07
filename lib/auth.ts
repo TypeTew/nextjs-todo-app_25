@@ -1,8 +1,7 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import db from "./db";
+import pool from "./neon";
 import bcrypt from "bcryptjs";
-import { RowDataPacket } from "mysql2";
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -20,14 +19,14 @@ export const authOptions: NextAuthOptions = {
                 }
 
                 try {
-                    const [rows] = await db.query<RowDataPacket[]>(
-                        'SELECT * FROM users WHERE email = ?',
+                    const result = await pool.query(
+                        'SELECT * FROM users WHERE email = $1',
                         [credentials.email]
                     );
 
-                    if (rows.length === 0) return null;
+                    if (result.rows.length === 0) return null;
 
-                    const user = rows[0];
+                    const user = result.rows[0];
                     const isValid = await bcrypt.compare(credentials.password, user.password);
 
                     if (!isValid) return null;

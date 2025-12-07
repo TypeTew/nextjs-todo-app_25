@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
-import db from "@/lib/db";
+import pool from "@/lib/neon";
 import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
-
-import { RowDataPacket } from "mysql2";
 
 export async function POST(req: Request) {
     try {
@@ -14,16 +12,16 @@ export async function POST(req: Request) {
         }
 
         // Check if user exists
-        const [existing] = await db.query<RowDataPacket[]>('SELECT * FROM users WHERE email = ?', [email]);
-        if (existing.length > 0) {
+        const existing = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+        if (existing.rows.length > 0) {
             return NextResponse.json({ error: "Email already exists" }, { status: 409 });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const id = uuidv4();
 
-        await db.query(
-            'INSERT INTO users (id, name, email, password) VALUES (?, ?, ?, ?)',
+        await pool.query(
+            'INSERT INTO users (id, name, email, password) VALUES ($1, $2, $3, $4)',
             [id, name, email, hashedPassword]
         );
 
