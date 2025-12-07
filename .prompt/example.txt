@@ -1,0 +1,9 @@
+ให้สร้างหน้าเว็บสำหรับ To Do List ซึ่งเป็นเว็บสำหรับทำ
+To Do List โดยให้มีส่วนของ sign up, sign in ใช้ design
+ตามภาพ
+
+เชื่อมต่อฐานข้อมูล MySQL แบบ local โดยใช้ user: root, password:, host: localhost,
+database: medolist_db
+
+
+use env for docker and docker -compose
