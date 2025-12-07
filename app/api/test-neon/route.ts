@@ -9,12 +9,12 @@ export async function GET() {
             message: 'Connected to Neon/Postgres successfully',
             time: result.rows[0].now
         });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Database Connection Error:', error);
         return NextResponse.json({
             success: false,
             message: 'Failed to connect to Neon',
-            error: error.message
+            error: error instanceof Error ? error.message : String(error)
         }, { status: 500 });
     }
 }
